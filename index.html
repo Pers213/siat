@@ -87,6 +87,30 @@
       box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
     }
 
+    .custom-input {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      border: 2px solid #e9e4f8;
+      background: #faf9ff;
+      font-size: 16px;
+      font-family: inherit;
+      color: #3d3d4e;
+      outline: none;
+      display: none;
+      margin-bottom: 24px;
+      transition: border-color 0.25s ease;
+    }
+
+    .custom-input:focus {
+      border-color: #7c3aed;
+    }
+
+    .custom-input.visible {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
     .confirm {
       width: 100%;
       padding: 16px;
@@ -145,9 +169,11 @@
     <div class="options" id="options">
       <button class="option" data-place="в уютную кофейню">☕ Кофейня</button>
       <button class="option" data-place="в парк на прогулку">🌳 Парк</button>
-      <button class="option" data-place="в музей или галерею">🎨 Музей / галерея</button>
-      <button class="option" data-place="на набережную">🌊 Набережная</button>
+      <button class="option" data-place="покататься вместе">🚗 Покататься</button>
+      <button class="option" data-place="custom">✨ Напиши свой выбор</button>
     </div>
+
+    <input type="text" class="custom-input" id="customInput" placeholder="Напиши, куда бы ты хотела...">
 
     <button class="confirm" id="confirm">Готово ✓</button>
 
@@ -158,23 +184,50 @@
     const options = document.querySelectorAll('.option');
     const confirmBtn = document.getElementById('confirm');
     const resultBox = document.getElementById('result');
+    const customInput = document.getElementById('customInput');
     let selected = null;
 
     options.forEach(btn => {
       btn.addEventListener('click', () => {
         options.forEach(o => o.classList.remove('selected'));
         btn.classList.add('selected');
-        selected = btn.dataset.place;
         confirmBtn.style.display = 'block';
         resultBox.style.display = 'none';
+
+        if (btn.dataset.place === 'custom') {
+          customInput.classList.add('visible');
+          customInput.focus();
+          selected = 'custom';
+        } else {
+          customInput.classList.remove('visible');
+          customInput.value = '';
+          selected = btn.dataset.place;
+        }
       });
     });
 
     confirmBtn.addEventListener('click', () => {
-      if (!selected) return;
-      resultBox.innerHTML = `Отличный выбор! Идём ${selected}. 🎉<br>Напиши мне, когда тебе удобно — и я всё организую.`;
+      let text;
+
+      if (selected === 'custom') {
+        const userChoice = customInput.value.trim();
+        if (!userChoice) {
+          customInput.focus();
+          customInput.style.borderColor = '#ef4444';
+          return;
+        }
+        text = `Отличный выбор! Идём ${userChoice}. 🎉<br>Напиши мне, когда тебе удобно — и я всё организую.`;
+      } else {
+        text = `Отличный выбор! Идём ${selected}. 🎉<br>Напиши мне, когда тебе удобно — и я всё организую.`;
+      }
+
+      resultBox.innerHTML = text;
       resultBox.style.display = 'block';
       confirmBtn.style.display = 'none';
+    });
+
+    customInput.addEventListener('input', () => {
+      customInput.style.borderColor = '#e9e4f8';
     });
   </script>
 
